@@ -1,3 +1,4 @@
+from bson import json_util
 import pymongo
 import time
 
@@ -7,7 +8,7 @@ def get_latest(node):
   client = pymongo.MongoClient('ds115198.mlab.com', port=15198, username='climate_reader', password='climate_reader', authSource='climate')
   db = client.climate
 
-  return db.v0_1.find({"node" : node}).sort("timestamp", pymongo.DESCENDING)[0]
+  return json_util.dumps(db.v0_1.find({"node" : node}).sort("timestamp", pymongo.DESCENDING)[0])
   
 def get_range(start, end):
   # Connect with read only account
@@ -23,5 +24,5 @@ def get_range(start, end):
     ]
   })
 
-  return [item for item in cursor]
+  return json_util.dumps([item for item in cursor])
 

@@ -12,9 +12,9 @@ def index():
 
 @app.route('/latest/<node>')
 def latest(node):
-  data = datas.last(node)
+  data = datas.get_latest(node)
   print data
-  return json.dumps(data)
+  return data
 
 @app.route('/day/<year>/<month>/<day>')
 def day(year, month, day):
@@ -25,11 +25,7 @@ def day(year, month, day):
   # Get the data
   data = datas.get_range(start, end)
   print data
-  return json.dumps(data)
-
-#print "DATA"
-#print day(2018,02,02)
-#print "END-DATA"
+  return data
 
 if (__name__ == "__main__"):
   app.run(host="0.0.0.0", port=80)
