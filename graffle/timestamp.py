@@ -10,6 +10,10 @@ def get_start_of_day(timestamp):
   dt = datetime.fromtimestamp(timestamp)
   return get_timestamp(dt.year, dt.month, dt.day)
 
+def get_pretty_day(year, month, day):
+  dt = datetime(year, month, day)
+  return dt.strftime("%a %B %d %Y")
+
 def get_days_in_range(start, end):
   # Round start time down and end time up to the nearest day
   start = get_start_of_day(start)

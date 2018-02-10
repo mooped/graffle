@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, send_from_directory
 import json
 
 import template
@@ -14,7 +14,7 @@ def index():
   dates.reverse()
   for date in dates:
     date.update({
-      "uri" : "/day/%d/%2d/%2d" % (date["year"], date["month"], date["day"])
+      "uri" : "/day/%d/%02d/%02d" % (date["year"], date["month"], date["day"])
     })
   nodes = [{"name" : node, "uri" : "/latest/%s" % node} for node in sorted(datas.get_nodes())]
 
@@ -23,20 +23,68 @@ def index():
     "dates" : dates,
   })
 
+@app.route('/js/<path:path>')
+def send_js(path):
+  return send_from_directory("js", path)
+
 @app.route('/latest/<node>')
-def latest(node):
+def latest_json(node):
   data = json.dumps(datas.get_latest(node))
   return data
 
-@app.route('/day/<year>/<month>/<day>')
-def day(year, month, day):
+@app.route('/day/<int:year>/<int:month>/<int:day>')
+def day_json(year, month, day):
   # 24 hour window
-  start = int(timestamp.get_timestamp(int(year), int(month), int(day)))
+  start = int(timestamp.get_timestamp(year, month, day))
   end = start + (24 * 60 * 60)
 
   # Get the data
   data = datas.get_range(start, end)
   return json.dumps(data)
+
+# Format data for Flot
+def format_plot(node, param, data):
+  return {
+    "label" : "%s-%s" % (node, param),
+    "data" : [
+      [p["timestamp"], p["data"][param]]
+      for p in data
+      if "node" in p and
+        str(p["node"]) == str(node) and
+        "timestamp" in p and
+        "data" in p and
+         param in p["data"]
+      ]
+  }
+
+@app.route('/graph/day/<int:year>/<int:month>/<int:day>')
+def day_graph(year, month, day):
+  # 24 hour window
+  start = int(timestamp.get_timestamp(year, month, day))
+  end = start + (24 * 60 * 60)
+
+  # Get the data
+  data = datas.get_range(start, end)
+
+  # Get the list of nodes
+  nodes = datas.get_nodes()
+
+  # Format the appropriate plots for Flot
+  params = ["temp", "humidity", "co2_ppm", "voc_ppb", "core_temp"]
+  plots = []
+  for node in nodes:
+    for param in params:
+      plots.append(format_plot(node, param, data))
+
+  return template.render("templates/graph.html", {
+    "pretty" : timestamp.get_pretty_day(year, month, day),
+    "year" : year,
+    "month" : month,
+    "day" : day,
+    "nodes" : nodes,
+    "raw_plots" : plots,
+    "plots" : json.dumps(plots),
+  })
 
 if (__name__ == "__main__"):
   app.run(host="0.0.0.0", port=80, threaded=True)
