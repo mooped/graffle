@@ -32,6 +32,7 @@ def index():
     "nodes" : nodes,
     "dates" : dates,
     "params" : json.dumps(params),
+    "autoplot" : dates[0]["plot_uri"] if len(dates) > 0 else "",
   })
 
 @app.route('/js/<path:path>')

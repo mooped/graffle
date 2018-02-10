@@ -59,6 +59,8 @@
 
             var params = {{{params}}};
 
+            var autoplot = "{{{autoplot}}}";
+
             function buildParams()
             {
                 var selectors = $("#plots");
@@ -116,6 +118,10 @@
 
             buildParams();
             doPlot(raw_plots);
+            if (autoplot)
+            {
+                fetchAndPlot(autoplot);
+            }
         </script>
     </body>
 </html>
