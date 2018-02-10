@@ -10,29 +10,45 @@
         <title>Climate Dashboard</title>
     </head>
     <body>
-        <div class="container-fluid" id="title">
-            <h1>Climate Dashboard</h1>
-        </div>
-        <div class="container-fluid" id="plots-container">
-            <form>
-                <div class="form-group" id="plots">
-                </div>
-            </form>
-        </div>
-        <div class="container-fluid" id="graphs">
+        <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+            <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Climate Dashboard</a>
+            <!--
+            <ul class="navbar-nav px-3">
+                <li class="nav-item text-nowrap">
+                    <a class="nav-link" href="#">Sign out</a>
+                </li>
+            </ul>
+            -->
+        </nav>
+              
+        <div class="container-fluid">
             <div class="row">
-                <div class="col-" style="max-height: 720px; overflow-y:scroll;">
-                    <ul class="list-group">
-                        {{#dates}}
-                        <li class="list-group-item"><a href="javascript:fetchAndPlot('{{plot_uri}}');" class="date" data-plot-uri="{{plot_uri}}" data-raw-uri="{{uri}}">{{pretty}}</a></li>
-                        {{/dates}}
-                    </ul>
-                </div>
-                <div class="col-xl">
+                <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+                    <div class="sidebar-sticky">
+                        <ul class="nav flex-column">
+                            {{#dates}}
+                            <li class="nav-item">
+                                <a href="javascript:fetchAndPlot('{{plot_uri}}');" class="nav-link date" data-plot-uri="{{plot_uri}}" data-raw-uri="{{uri}}">
+                                    {{pretty}}
+                                </a>
+                            </li>
+                            {{/dates}}
+                        </ul>
+                    </div>
+                </nav>
+                <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                        <h1 class="h2" id="view-title">Dashboard</h1>
+                        <div class="mr-2 plots-container">
+                            <form>
+                                <div class="form-group" id="plots"></div>
+                            </form>
+                        </div>
+                    </div>
                     <div class="graph-container" style="width: 100%; height: 100%; max-height: 1080px;">
                         <div id="placeholder" class="graph-placeholder" style="width: 100%; height: 100%;"></div>
                     </div>
-                </div>
+                </main>
             </div>
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -102,6 +118,7 @@
                 }
 
                 $.ajax(uri).done(function(data) {
+                    $("#view-title").html(data.pretty);
                     raw_plots = data.raw_plots;
                     params = data.raw_params;
                     autoplot = uri;

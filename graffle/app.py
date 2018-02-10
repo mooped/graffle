@@ -20,9 +20,6 @@ params = [
 def index():
   first, last = datas.get_time_range()
   dates = timestamp.get_days_in_range(first, last)
-  dates.extend(timestamp.get_days_in_range(first, last))
-  dates.extend(timestamp.get_days_in_range(first, last))
-  dates.extend(timestamp.get_days_in_range(first, last))
   dates.reverse()
   for date in dates:
     date.update({
