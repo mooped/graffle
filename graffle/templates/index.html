@@ -2,5 +2,17 @@
 <head><title>Datalogger</title></head>
 <body>
 <h1>Datalogger</h1>
+<h2>Latest:</h2>
+<ul>
+    {{#nodes}}
+    <li><a href="{{uri}}">{{name}}</a></li>
+    {{/nodes}}
+</ul>
+<h2>Days:</h2>
+<ul>
+    {{#dates}}
+    <li><a href="{{uri}}">{{pretty}}</a></li>
+    {{/dates}}
+</ul>
 </body>
 </html>
