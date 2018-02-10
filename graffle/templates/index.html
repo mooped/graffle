@@ -1,18 +1,121 @@
-<html>
-<head><title>Datalogger</title></head>
-<body>
-<h1>Datalogger</h1>
-<h2>Latest:</h2>
-<ul>
-    {{#nodes}}
-    <li><a href="{{uri}}">{{name}}</a></li>
-    {{/nodes}}
-</ul>
-<h2>Days:</h2>
-<ul>
-    {{#dates}}
-    <li><a href="{{uri}}">{{pretty}}</a></li>
-    {{/dates}}
-</ul>
-</body>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+        <title>Climate Dashboard</title>
+    </head>
+    <body>
+        <div class="container" id="title">
+            <h1>Climate Dashboard</h1>
+        </div>
+        <!--
+        <div class="container" id="latest">
+            <div class="row">
+                {{#nodes}}
+                <div class="col-sm">
+                    <h2 id="node-{{name}}">{{name}}</h2>
+                    <ul id="data-{{name}}">
+                    </ul>
+                </div>
+                {{/nodes}}
+            </div>
+        </div>
+        -->
+        <div class="container" id="plots-container">
+            <form>
+                <div class="form-group" id="plots">
+                </div>
+            </form>
+        </div>
+        <div class="container" id="graphs">
+            <div class="row">
+                <div class="col">
+                    <ul class="list-group">
+                        {{#dates}}
+                        <li class="list-group-item"><a href="javascript:fetchAndPlot('{{plot_uri}}');" class="date" data-plot-uri="{{plot_uri}}" data-raw-uri="{{uri}}">{{pretty}}</a></li>
+                        {{/dates}}
+                    </ul>
+                </div>
+                <div class="col">
+                    <div class="graph-container" style="width: 850px; height: 450px;">
+                        <div id="placeholder" class="graph-placeholder" style="width: 100%; height: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="/js/flot/jquery.min.js"></script>
+        <script src="/js/flot/jquery.flot.min.js"></script>
+        <script src="/js/flot/jquery.flot.time.min.js"></script>
+        <script type="text/javascript">
+            var raw_plots = [{"label" : "placeholder", "data" : [[0,0], [1,1]]}];
+            var filtered_plots = raw_plots;
+
+            var params = {{{params}}};
+
+            function buildParams()
+            {
+                var selectors = $("#plots");
+                $(".plot-select-div").remove();
+                $.each(params, function(i, param) {
+                    var checked = param[2] ? " checked" : "";
+                    selectors.append('<div class="form-check form-check-inline plot-select-div"><input type="checkbox" class="form-check-input plot-select" id="plot-select-' + param[0] + '"' + checked + ' data-param="' + param[0] + '" onChange="replot()"><label class="form-check-label" for="plot-select' + param[0] + '">' + param[1] + '</label></div>');
+                });
+            }
+
+            function updateParams()
+            {
+                filtered_plots = [];
+
+                function addPlot(param)
+                {
+                    for (var i = 0; i < raw_plots.length; ++i)
+                    {
+                        if (raw_plots[i].param == param)
+                        {
+                            filtered_plots.push(raw_plots[i]);
+                        }
+                    }
+                }
+
+                $(".plot-select").each(function(i, input) {
+                    if (input.checked)
+                    {
+                        addPlot(input.attributes["data-param"].value);
+                    }
+                });
+            }
+
+    		function doPlot(plots)
+            {
+                $.plot("#placeholder", plots, {
+                    xaxis : { mode: "time", }
+                });
+    		}
+
+            function replot()
+            {
+                updateParams();
+                doPlot(filtered_plots);
+            }
+
+            function fetchAndPlot(uri)
+            {
+                $.ajax(uri).done(function(data) {
+                    raw_plots = data.raw_plots;
+                    params = data.raw_params;
+                    replot();
+                });
+            }
+
+            buildParams();
+            doPlot(raw_plots);
+        </script>
+    </body>
 </html>
