@@ -1,6 +1,7 @@
 from flask import Flask
 import json
 
+import template
 import timestamp
 import datas
 
@@ -8,7 +9,7 @@ app = Flask('graffle')
 
 @app.route('/')
 def index():
-  return "Welcome to the stone of graffle"
+  return template.render("templates/index.html", {})
 
 @app.route('/latest/<node>')
 def latest(node):
