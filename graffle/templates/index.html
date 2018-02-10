@@ -10,39 +10,26 @@
         <title>Climate Dashboard</title>
     </head>
     <body>
-        <div class="container" id="title">
+        <div class="container-fluid" id="title">
             <h1>Climate Dashboard</h1>
         </div>
-        <!--
-        <div class="container" id="latest">
-            <div class="row">
-                {{#nodes}}
-                <div class="col-sm">
-                    <h2 id="node-{{name}}">{{name}}</h2>
-                    <ul id="data-{{name}}">
-                    </ul>
-                </div>
-                {{/nodes}}
-            </div>
-        </div>
-        -->
-        <div class="container" id="plots-container">
+        <div class="container-fluid" id="plots-container">
             <form>
                 <div class="form-group" id="plots">
                 </div>
             </form>
         </div>
-        <div class="container" id="graphs">
+        <div class="container-fluid" id="graphs">
             <div class="row">
-                <div class="col">
+                <div class="col-" style="max-height: 720px; overflow-y:scroll;">
                     <ul class="list-group">
                         {{#dates}}
                         <li class="list-group-item"><a href="javascript:fetchAndPlot('{{plot_uri}}');" class="date" data-plot-uri="{{plot_uri}}" data-raw-uri="{{uri}}">{{pretty}}</a></li>
                         {{/dates}}
                     </ul>
                 </div>
-                <div class="col">
-                    <div class="graph-container" style="width: 850px; height: 450px;">
+                <div class="col-xl">
+                    <div class="graph-container" style="width: 100%; height: 100%; max-height: 1080px;">
                         <div id="placeholder" class="graph-placeholder" style="width: 100%; height: 100%;"></div>
                     </div>
                 </div>
@@ -109,19 +96,25 @@
 
             function fetchAndPlot(uri)
             {
+                if (uri == undefined)
+                {
+                    uri = autoplot;
+                }
+
                 $.ajax(uri).done(function(data) {
                     raw_plots = data.raw_plots;
                     params = data.raw_params;
+                    autoplot = uri;
                     replot();
                 });
             }
 
+            // Initial plot
             buildParams();
-            doPlot(raw_plots);
-            if (autoplot)
-            {
-                fetchAndPlot(autoplot);
-            }
+            fetchAndPlot(autoplot);
+
+            // Refresh every 30 seconds
+            setInterval(fetchAndPlot, 15000);
         </script>
     </body>
 </html>
