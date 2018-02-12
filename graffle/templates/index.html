@@ -82,7 +82,7 @@
                 {
                     for (var i = 0; i < raw_plots.length; ++i)
                     {
-                        if (raw_plots[i].param == param)
+                        if (raw_plots[i].param == param && raw_plots[i].data.length > 0)
                         {
                             filtered_plots.push(raw_plots[i]);
                         }
