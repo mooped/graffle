@@ -9,11 +9,11 @@ app = Flask('graffle')
 
 # Hardcoded params and labels
 params = [
-  ("temp" , "Temperature (&#176;C)", True),
-  ("humidity", "Humidity (%RH)", True),
-  ("co2_ppm", "Carbon Dioxide (Parts Per Million)", False),
-  ("voc_ppb", "Volatile Organic Compounds (Parts Per Billion)", False),
-  ("core_temp", "CPU Temp (???)", False),
+  ("temp" , "Temperature (&#176;C)", True, 15.0, 35.0),
+  ("humidity", "Humidity (%RH)", True, 0.0, 100.0),
+  ("co2_ppm", "Carbon Dioxide (Parts Per Million)", False, 400.0, 8192.0),
+  ("voc_ppb", "Volatile Organic Compounds (Parts Per Billion)", False, 0.0, 1187.0),
+  ("core_temp", "CPU Temp (???)", False, 0.0, 255.0),
 ]
 
 @app.route('/')
@@ -55,18 +55,20 @@ def day_json(year, month, day):
   return Response(json.dumps(data), mimetype='application/json')
 
 # Format data for Flot
-def format_plot(node, param, label, data):
+def format_plot(node, param, data):
   return {
-    "label" : "%s %s" % (node, label),
-    "param" : param,
+    "label" : "%s %s" % (node, param[1]),
+    "param" : param[0],
     "data" : [
-      [p["timestamp"] * 1000, p["data"][param]]
+      [p["timestamp"] * 1000, p["data"][param[0]]]
       for p in data
-      if "node" in p and
-        str(p["node"]) == str(node) and
-        "timestamp" in p and
-        "data" in p and
-         param in p["data"]
+      if "node" in p
+        and str(p["node"]) == str(node)
+        and "timestamp" in p
+        and "data" in p
+        and param[0] in p["data"]
+        and p["data"][param[0]] >= param[3]
+        and p["data"][param[0]] <= param[4]
       ]
   }
 
@@ -86,7 +88,7 @@ def day_plot(year, month, day):
   plots = []
   for node in nodes:
     for param in params:
-      plots.append(format_plot(node, param[0], param[1], data))
+      plots.append(format_plot(node, param, data))
 
   return Response(
     json.dumps({
@@ -95,7 +97,7 @@ def day_plot(year, month, day):
       "month" : month,
       "day" : day,
       "nodes" : nodes,
-      "params" : json.dumps(params),
+      "raw_params" : params,
       "raw_plots" : plots,
     }),
     mimetype='application/json'
@@ -114,11 +116,10 @@ def day_graph(year, month, day):
   nodes = datas.get_nodes()
 
   # Format the appropriate plots for Flot
-  params = ["temp", "humidity", "co2_ppm", "voc_ppb", "core_temp"]
   plots = []
   for node in nodes:
     for param in params:
-      plots.append(format_plot(node, param, param, data))
+      plots.append(format_plot(node, param, data))
 
   return template.render("templates/graph.html", {
     "pretty" : timestamp.get_pretty_day(year, month, day),
