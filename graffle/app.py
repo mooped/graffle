@@ -7,13 +7,13 @@ import datas
 
 app = Flask('graffle')
 
-# Hardcoded params and labels
+# Hardcoded params, labels, limits, and axes
 params = [
-  ("temp" , "Temperature (&#176;C)", True, 15.0, 35.0),
-  ("humidity", "Humidity (%RH)", True, 0.0, 100.0),
-  ("co2_ppm", "Carbon Dioxide (Parts Per Million)", False, 400.0, 8192.0),
-  ("voc_ppb", "Volatile Organic Compounds (Parts Per Billion)", False, 0.0, 1187.0),
-  ("core_temp", "CPU Temp (???)", False, 0.0, 255.0),
+  ("temp" , "Temperature (&#176;C)", True, 15.0, 35.0, 1),
+  ("humidity", "Humidity (%RH)", True, 0.0, 100.0, 2),
+  ("co2_ppm", "Carbon Dioxide (Parts Per Million)", False, 400.0, 8192.0, 3),
+  ("voc_ppb", "Volatile Organic Compounds (Parts Per Billion)", False, 0.0, 1187.0, 4),
+  ("core_temp", "CPU Temp (???)", False, 0.0, 255.0, 5),
 ]
 
 @app.route('/')
@@ -69,7 +69,8 @@ def format_plot(node, param, data):
         and param[0] in p["data"]
         and p["data"][param[0]] >= param[3]
         and p["data"][param[0]] <= param[4]
-      ]
+      ],
+    "yaxis" : param[5]
   }
 
 @app.route('/plot/day/<int:year>/<int:month>/<int:day>')

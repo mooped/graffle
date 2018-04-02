@@ -99,8 +99,12 @@
 
     		function doPlot(plots)
             {
+                var leftAxis = { min : 0, };
+                var rightAxis = { alignTicksWithAxis: 1, position: "right",
+                };
                 $.plot("#placeholder", plots, {
-                    xaxis : { mode: "time", }
+                    xaxes: [ { mode: "time" } ],
+				    yaxes: [ leftAxis, rightAxis, rightAxis, rightAxis, rightAxis ],
                 });
     		}
 
