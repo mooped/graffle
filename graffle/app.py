@@ -44,7 +44,7 @@ def latest_json(node):
   data = json.dumps(datas.get_latest(node))
   return Response(data, mimetype='application/json')
 
-@app.route('/slack/temp')
+@app.route('/slack/temp', methods=['POST'])
 def slack_temp():
   node = request.form['text']
   data = datas.get_latest(node)
