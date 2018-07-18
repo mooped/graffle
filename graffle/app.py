@@ -60,9 +60,11 @@ def slack_temp():
       response = {
         "response_type" : "in_channel",
         "text" : "Valid nodes:",
-        "attachment" : {
-          "text" : ", ".join(nodes)
-        }
+        "attachments" : [
+          {
+            "text" : ", ".join(nodes)
+          }
+        ]
       }
     except:
       pass
