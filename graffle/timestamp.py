@@ -1,4 +1,5 @@
 from datetime import datetime
+import pytz
 
 def to_timestamp(dt):
   return (dt - datetime(1970, 1, 1)).total_seconds()
@@ -31,3 +32,9 @@ def get_days_in_range(start, end):
     })
 
   return days
+
+# Trick Flot into rendering local time (it expects UTC timestamps always) by performing timezone conversion backwards
+localtz = pytz.timezone("Europe/London")
+def localise(ts):
+  dt = datetime.fromtimestamp(ts).replace(tzinfo=localtz)
+  return to_timestamp(pytz.utc.normalize(dt).replace(tzinfo=None))

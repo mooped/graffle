@@ -2,6 +2,7 @@ from bson import json_util
 import json
 import pymongo
 import time
+import timestamp
 
 def to_json(data):
   return json.loads(json_util.dumps(data))
@@ -33,4 +34,10 @@ def get_range(start, end):
     ]
   })
 
-  return to_json([item for item in cursor])
+  # Convert the timestamps to trick Flot into displaying correct times
+  data = []
+  for item in cursor:
+    item["timestamp"] = timestamp.localise(item["timestamp"])
+    data.append(item)
+
+  return to_json(data)
