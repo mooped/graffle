@@ -49,9 +49,9 @@ def slack_temp():
   node = request.form['text']
   data = datas.get_latest(node)
   response = {
-    "text" : "The temperature at %s is %f degrees Celcius. Humidity is %f%% RH." % (node, data.get("temp", -1), data.get("humidity", -1)),
+    "text" : "The temperature at %s is %2.2f degrees Celcius. Humidity is %2.2f%% RH." % (node, data["data"].get("temp", -1), data["data"].get("humidity", -1)),
   }
-  return Response(data, mimetype='application/json')
+  return Response(json.dumps(response), mimetype='application/json')
 
 @app.route('/day/<int:year>/<int:month>/<int:day>')
 def day_json(year, month, day):
