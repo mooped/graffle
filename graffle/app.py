@@ -44,6 +44,15 @@ def latest_json(node):
   data = json.dumps(datas.get_latest(node))
   return Response(data, mimetype='application/json')
 
+@app.route('/slack/temp')
+def slack_temp():
+  node = request.form['text']
+  data = datas.get_latest(node)
+  response = {
+    "text" : "The temperature at %s is %f degrees Celcius. Humidity is %f%% RH." % (node, data.get("temp", -1), data.get("humidity", -1)),
+  }
+  return Response(data, mimetype='application/json')
+
 @app.route('/day/<int:year>/<int:month>/<int:day>')
 def day_json(year, month, day):
   # 24 hour window
