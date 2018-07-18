@@ -47,10 +47,25 @@ def latest_json(node):
 @app.route('/slack/temp', methods=['POST'])
 def slack_temp():
   node = request.form['text']
-  data = datas.get_latest(node)
-  response = {
-    "text" : "The temperature at %s is %2.2f degrees Celcius. Humidity is %2.2f%% RH." % (node, data["data"].get("temp", -1), data["data"].get("humidity", -1)),
-  }
+  response = { "text" : "Oops! Something went wrong!" }
+  try:
+    data = datas.get_latest(node)
+    response = {
+      "response_type" : "in_channel",
+      "text" : "The temperature at %s is %2.2f degrees Celcius. Humidity is %2.2f%% RH." % (node, data["data"].get("temp", -1), data["data"].get("humidity", -1)),
+    }
+  except:
+    try:
+      nodes = datas.get_nodes()
+      response = {
+        "response_type" : "in_channel",
+        "text" : "Valid nodes:",
+        "attachment" : {
+          "text" : ", ".join(nodes)
+        }
+      }
+    except:
+      pass
   return Response(json.dumps(response), mimetype='application/json')
 
 @app.route('/day/<int:year>/<int:month>/<int:day>')
