@@ -69,8 +69,8 @@
                 var selectors = $("#plots");
                 $(".plot-select-div").remove();
                 $.each(params, function(i, param) {
-                    var checked = param[2] ? " checked" : "";
-                    selectors.append('<div class="form-check form-check-inline plot-select-div"><input type="checkbox" class="form-check-input plot-select" id="plot-select-' + param[0] + '"' + checked + ' data-param="' + param[0] + '" onChange="replot()"><label class="form-check-label" for="plot-select' + param[0] + '">' + param[1] + '</label></div>');
+                    var checked = param[3] ? " checked" : "";
+                    selectors.append('<div class="form-check form-check-inline plot-select-div"><input type="checkbox" class="form-check-input plot-select" id="plot-select-' + param[0] + "-" + param[1] + '"' + checked + ' data-param="' + param[0] + "-" + param[1] + '" onChange="replot()"><label class="form-check-label" for="plot-select' + param[0] + "-" + param[1] + '">' + param[2] + '</label></div>');
                 });
             }
 

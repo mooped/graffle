@@ -9,11 +9,11 @@ app = Flask('graffle')
 
 # Hardcoded params, labels, limits, and axes
 params = [
-  ("temp" , "Temperature (&#176;C)", True, 15.0, 35.0, 1),
-  ("humidity", "Humidity (%RH)", True, 0.0, 100.0, 2),
-  ("co2_ppm", "Carbon Dioxide (Parts Per Million)", False, 400.0, 8192.0, 3),
-  ("voc_ppb", "Volatile Organic Compounds (Parts Per Billion)", False, 0.0, 1187.0, 4),
-  ("core_temp", "CPU Temp (???)", False, 0.0, 255.0, 5),
+  ("si7007", "temperature" , "Temperature (&#176;C)", True, 15.0, 35.0, 1),
+  ("si7007", "humidity", "Humidity (%RH)", True, 0.0, 100.0, 2),
+  ("ccs811", "co2_ppm", "Carbon Dioxide (Parts Per Million)", False, 400.0, 8192.0, 3),
+  ("ccs811", "voc_ppb", "Volatile Organic Compounds (Parts Per Billion)", False, 0.0, 1187.0, 4),
+  ("core", "internal_temperature", "CPU Temp (???)", False, 0.0, 255.0, 5),
 ]
 
 @app.route('/')
@@ -52,7 +52,7 @@ def slack_temp():
     data = datas.get_latest(node)
     response = {
       "response_type" : "in_channel",
-      "text" : "The temperature at %s is %2.2f degrees Celcius. Humidity is %2.2f%% RH." % (node, data["data"].get("temp", -1), data["data"].get("humidity", -1)),
+      "text" : "The temperature at %s is %2.2f degrees Celcius. Humidity is %2.2f%% RH." % (node, data.get("si7007", {}).get("temp", -1), data.get("si7007", {}).get("humidity", -1)),
     }
   except:
     try:
@@ -82,22 +82,23 @@ def day_json(year, month, day):
 
 # Format data for Flot
 def format_plot(node, param, data):
-  return {
-    "label" : "%s %s" % (node, param[1]),
-    "param" : param[0],
+  plot = {
+    "label" : "%s %s" % (node, param[2]),
+    "param" : param[0] + "-" + param[1],
     "data" : [
-      [p["timestamp"] * 1000, p["data"][param[0]]]
+      [p["timestamp"] * 1000, p.get(param[0], {}).get(param[1], {})]
       for p in data
       if "node" in p
         and str(p["node"]) == str(node)
         and "timestamp" in p
-        and "data" in p
-        and param[0] in p["data"]
-        and p["data"][param[0]] >= param[3]
-        and p["data"][param[0]] <= param[4]
+        and param[0] in p
+        and param[1] in p.get(param[0])
+        and p.get(param[0]).get(param[1]) >= param[4]
+        and p.get(param[0]).get(param[1]) <= param[5]
       ],
     "yaxis" : param[5]
   }
+  return plot
 
 @app.route('/plot/day/<int:year>/<int:month>/<int:day>')
 def day_plot(year, month, day):
@@ -129,34 +130,6 @@ def day_plot(year, month, day):
     }),
     mimetype='application/json'
   )
-
-@app.route('/graph/day/<int:year>/<int:month>/<int:day>')
-def day_graph(year, month, day):
-  # 24 hour window
-  start = int(timestamp.get_timestamp(year, month, day))
-  end = start + (24 * 60 * 60)
-
-  # Get the data
-  data = datas.get_range(start, end)
-
-  # Get the list of nodes
-  nodes = datas.get_nodes()
-
-  # Format the appropriate plots for Flot
-  plots = []
-  for node in nodes:
-    for param in params:
-      plots.append(format_plot(node, param, data))
-
-  return template.render("templates/graph.html", {
-    "pretty" : timestamp.get_pretty_day(year, month, day),
-    "year" : year,
-    "month" : month,
-    "day" : day,
-    "nodes" : nodes,
-    "raw_plots" : plots,
-    "plots" : json.dumps(plots),
-  })
 
 if (__name__ == "__main__"):
   app.run(host="0.0.0.0", port=80, threaded=True)
