@@ -97,16 +97,17 @@
                 });
             }
 
-    		function doPlot(plots)
+            function doPlot(plots)
             {
                 var leftAxis = { };
                 var rightAxis = { alignTicksWithAxis: 1, position: "right",
                 };
                 $.plot("#placeholder", plots, {
+                    legend: { position: "nw", noColumns: 2 },
                     xaxes: [ { mode: "time" } ],
-				    yaxes: [ leftAxis, rightAxis, rightAxis, rightAxis, rightAxis ],
+                    yaxes: [ leftAxis, rightAxis, rightAxis, rightAxis, rightAxis ],
                 });
-    		}
+            }
 
             function replot()
             {
