@@ -10,7 +10,7 @@ app = Flask('graffle')
 # Hardcoded params, labels, limits, and axes
 params = [
   ("si7007", "temperature" , "Temperature (&#176;C)", True, 15.0, 35.0, 1),
-  ("si7007", "humidity", "Humidity (%RH)", True, 0.0, 100.0, 2),
+  ("si7007", "humidity", "Humidity (%RH)", False, 0.0, 100.0, 2),
   ("ccs811", "co2_ppm", "Carbon Dioxide (Parts Per Million)", False, 400.0, 8192.0, 3),
   ("ccs811", "voc_ppb", "Volatile Organic Compounds (Parts Per Billion)", False, 0.0, 1187.0, 4),
   ("core", "internal_temperature", "CPU Temp (???)", False, 0.0, 255.0, 5),
