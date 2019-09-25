@@ -44,6 +44,11 @@ def latest_json(node):
   data = json.dumps(datas.get_latest(node))
   return Response(data, mimetype='application/json')
 
+@app.route('/refresh_ids')
+def refresh_ids():
+  datas.refresh_ids()
+  return Response(json.dumps({"status" : "ok"}), mimetype='application/json')
+
 @app.route('/slack/temp', methods=['POST'])
 def slack_temp():
   node = request.form['text']
