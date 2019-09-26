@@ -64,6 +64,8 @@
 
             var autoplot = "{{{autoplot}}}";
 
+            var last_request = 0;
+
             function buildParams()
             {
                 var selectors = $("#plots");
@@ -121,13 +123,22 @@
                 {
                     uri = autoplot;
                 }
+                else
+                {
+                  $("#view-title").html("Loading...");
+                  autoplot = uri;
+                  raw_plots = [{"label" : "placeholder", "data" : [[0,0], [1,1]]}];
+                  replot();
+                }
 
                 $.ajax(uri).done(function(data) {
+                  if (uri == autoplot)
+                  {
                     $("#view-title").html(data.pretty);
                     raw_plots = data.raw_plots;
                     params = data.raw_params;
-                    autoplot = uri;
                     replot();
+                  }
                 });
             }
 
