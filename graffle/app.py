@@ -8,6 +8,7 @@ import datas
 app = Flask('graffle')
 
 # Hardcoded params, labels, limits, and axes
+# Key, SubKey, Pretty Name, Default, Min, Max, Y-Axis
 params = [
   ("si7007", "temperature" , "Temperature (&#176;C)", True, 15.0, 35.0, 1),
   ("si7007", "humidity", "Humidity (%RH)", False, 0.0, 100.0, 2),
@@ -101,7 +102,7 @@ def format_plot(node, param, data):
         and p.get(param[0]).get(param[1]) >= param[4]
         and p.get(param[0]).get(param[1]) <= param[5]
       ],
-    "yaxis" : param[5]
+    "yaxis" : param[6]
   }
   return plot
 
